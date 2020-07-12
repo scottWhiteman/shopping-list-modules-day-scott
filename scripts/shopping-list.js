@@ -1,7 +1,5 @@
-const store = {
-  items: [],
-  hideCheckedItems: false
-};
+import store from './store.js';
+import item from './item.js';
 
 const generateItemElement = function (item) {
   let itemTitle = `<span class="shopping-item shopping-item__checked">${item.name}</span>`;
@@ -45,7 +43,14 @@ const render = function () {
 };
 
 const addItemToShoppingList = function (itemName) {
-  store.items.push({ id: cuid(), name: itemName, checked: false });
+  try {
+    item.validateName(itemName);
+    store.items.push(item.create(itemName));
+    render();
+  } catch (error) {
+    console.log(error.message);
+  }
+  //store.items.push({ id: cuid(), name: itemName, checked: false });
 };
 
 const handleNewItemSubmit = function () {
@@ -66,7 +71,8 @@ const toggleCheckedForListItem = function (id) {
 const handleItemCheckClicked = function () {
   $('.js-shopping-list').on('click', '.js-item-toggle', event => {
     const id = getItemIdFromElement(event.currentTarget);
-    toggleCheckedForListItem(id);
+    //toggleCheckedForListItem(id);
+    store.findAndToggleChecked(id);
     render();
   });
 };
@@ -92,7 +98,8 @@ const handleDeleteItemClicked = function () {
     // get the index of the item in store.items
     const id = getItemIdFromElement(event.currentTarget);
     // delete the item
-    deleteListItem(id);
+    //deleteListItem(id);
+    store.findAndDelete(id);
     // render the updated shopping list
     render();
   });
@@ -116,7 +123,7 @@ const toggleCheckedItemsFilter = function () {
  */
 const handleToggleFilterClick = function () {
   $('.js-filter-checked').click(() => {
-    toggleCheckedItemsFilter();
+    store.toggleCheckedFilter();
     render();
   });
 };
@@ -126,7 +133,8 @@ const handleEditShoppingItemSubmit = function () {
     event.preventDefault();
     const id = getItemIdFromElement(event.currentTarget);
     const itemName = $(event.currentTarget).find('.shopping-item').val();
-    editListItemName(id, itemName);
+    //editListItemName(id, itemName);
+    store.findAndUpdateName(id, itemName);
     render();
   });
 };
@@ -138,6 +146,10 @@ const bindEventListeners = function () {
   handleEditShoppingItemSubmit();
   handleToggleFilterClick();
 };
+
+export const testEnc = function () {
+  console.log("THIS IS RUNNING");
+}
 
 // This object contains the only exposed methods from this module:
 export default {
